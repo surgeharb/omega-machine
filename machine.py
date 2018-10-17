@@ -68,13 +68,19 @@ def instructionExec(instruction):
   )
 
 def main():
+  # Program Counter
+  PC = 0
+
   print('machine started')
 
-  for instruction in MAIN_MEMORY:
+  for i, instruction in enumerate(MAIN_MEMORY):
     # for loop applies INSTRUCTION FETCH
     decoded_instruction = instructionDecode(instruction)
     instructionExec(decoded_instruction)
     printRegisters()
+
+    PC = PC + 4
+    print('iteration', i, 'done')
 
   print('bye')
 
