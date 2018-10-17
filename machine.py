@@ -1,13 +1,11 @@
 from config import *
+from program import *
 
 # Main Memory containing program instructions
-MAIN_MEMORY = [
-  list(reversed([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])),
-  list(reversed([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
-]
+MAIN_MEMORY = code
 
 # Registers
-REG = [2, 5, 0]
+REG = [0, 0, 0]
 
 def printRegisters():
   print('==> REGISTERS PRINT START')
@@ -35,23 +33,38 @@ def instructionDecode(instruction):
 
   return {
     'opcode': opcodes[opcode],
-    'param1': int(reg1, 2) - 1,
-    'param2': int(reg2, 2) - 1,
-    'param3': int(reg3, 2) - 1
+    'param1': int(reg1, 2),
+    'param2': int(reg2, 2),
+    'param3': int(reg3, 2)
   }
 
 def instructionExec(instruction):
-  reg_index = instruction['param3']
+  param2 = ''
 
   if (instruction['opcode'] == 'add'):
-    REG[reg_index] = REG[instruction['param1']] + REG[instruction['param2']]
+    reg_index = instruction['param3'] - 1
+    REG[reg_index] = REG[instruction['param1'] - 1] + REG[instruction['param2'] - 1]
+    param2 = 'R' + str(instruction['param2'])
+
+  elif (instruction['opcode'] == 'sub'):
+    reg_index = instruction['param3'] - 1
+    REG[reg_index] = REG[instruction['param1'] - 1] - REG[instruction['param2'] - 1]
+    param2 = 'R' + str(instruction['param2'])
+
+  elif (instruction['opcode'] == 'addc'):
+    reg_index = instruction['param3'] - 1
+    REG[reg_index] = REG[instruction['param1'] - 1] + instruction['param2']
+    param2 = instruction['param2']
+
+  elif (instruction['opcode'] == 'subc'):
+    reg_index = instruction['param3'] - 1
+    REG[reg_index] = REG[instruction['param1'] - 1] - instruction['param2']
+    param2 = instruction['param2']
 
   return print(
     '<== INSTRUCTION EXEC START\n' + instruction['opcode'],
-    'R' + str(instruction['param1'] + 1) + ',',
-    'R' + str(instruction['param2'] + 1) + ',',
-    'R' + str(instruction['param3'] + 1),
-    '\n<== INSTRUCTION FETCH END\n'
+    'R' + str(instruction['param1']) + ',', str(param2) + ',',
+    'R' + str(instruction['param3']), '\n<== INSTRUCTION FETCH END\n'
   )
 
 def main():
