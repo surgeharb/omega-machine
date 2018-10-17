@@ -39,25 +39,22 @@ def instructionDecode(instruction):
   }
 
 def instructionExec(instruction):
+  reg_index = instruction['param3'] - 1
   param2 = ''
 
   if (instruction['opcode'] == 'add'):
-    reg_index = instruction['param3'] - 1
     REG[reg_index] = REG[instruction['param1'] - 1] + REG[instruction['param2'] - 1]
     param2 = 'R' + str(instruction['param2'])
 
   elif (instruction['opcode'] == 'sub'):
-    reg_index = instruction['param3'] - 1
     REG[reg_index] = REG[instruction['param1'] - 1] - REG[instruction['param2'] - 1]
     param2 = 'R' + str(instruction['param2'])
 
   elif (instruction['opcode'] == 'addc'):
-    reg_index = instruction['param3'] - 1
     REG[reg_index] = REG[instruction['param1'] - 1] + instruction['param2']
     param2 = instruction['param2']
 
   elif (instruction['opcode'] == 'subc'):
-    reg_index = instruction['param3'] - 1
     REG[reg_index] = REG[instruction['param1'] - 1] - instruction['param2']
     param2 = instruction['param2']
 
