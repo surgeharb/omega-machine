@@ -4,11 +4,9 @@ from program import *
 # Main Memory containing program instructions
 M = code
 
-# Program Counter
-PC = 0
-
 # Registers
-R = [0, 0, 0]
+## Index 0 not used
+R = [0, 0, 0, 0]
 
 # OFFSETS
 OP_OFFSET = 26
@@ -18,210 +16,212 @@ R3_OFFSET = 11
 
 def printRegisters():
   print('==> REGISTERS PRINT START')
-  print('REG 1:', R[0])
-  print('REG 2:', R[1])
-  print('REG 3:', R[2])
+  print('REG 1:', R[1])
+  print('REG 2:', R[2])
+  print('REG 3:', R[3])
   print('<== REGISTERS PRINT END\n')
 
-def _load(destination, address):
+def _load(PC, destination, address):
   R[destination] = M[address]
-  PC = PC + 1
+  return PC + 1
 
-def _store(source, address):
+def _store(PC, source, address):
   M[address] = R[source]
-  PC = PC + 1
+  return PC + 1
 
-def _add(destination, source1, source2):
+def _add(PC, destination, source1, source2):
   R[destination]= R[source1] + R[source2]
-  PC = PC + 1
+  return PC + 1
 
-def _sub(destination, source1, source2):
+def _sub(PC, destination, source1, source2):
   R[destination]= R[source1] - R[source2]
-  PC = PC + 1
+  return PC + 1
 
-def _beq(source1, source2, address):
+def _beq(PC, source1, source2, address):
   if(R[source2] - R[source1] == 0):
-    PC = address
+    return address
   else:
-    PC = PC + 1
+    return PC + 1
 
-def _shl(destination, source1, source2):
+def _shl(PC, destination, source1, source2):
   R[destination] = R[source1] << R[source2]
-  PC = PC + 1
+  return PC + 1
 
-def _shr(destination, source1, source2):
+def _shr(PC, destination, source1, source2):
   R[destination] = R[source1] >> R[source2]
-  PC = PC + 1
+  return PC + 1
 
 def _br(address):
-  PC = address
+  return address
 
-def _addc(destination, source, val):
-    R[destination] = R[source] + val
-    PC = PC + 1
+def _addc(PC, destination, source, val):
+  R[destination] = R[source] + val
+  return PC + 1
 
-def _subc(destination, source, val):
-    R[destination] = R[source] - val
-    PC = PC + 1
+def _subc(PC, destination, source, val):
+  R[destination] = R[source] - val
+  return PC + 1
 
-def _and(destination, source1, source2):
-    R[destination] = R[source1] & R[source2]
-    PC = PC + 1
+def _and(PC, destination, source1, source2):
+  R[destination] = R[source1] & R[source2]
+  return PC + 1
 
-def _or(destination,  source1,  source2):
-    R[destination] = R[source1] | R[source2]
-    PC = PC + 1
+def _or(PC, destination,  source1,  source2):
+  R[destination] = R[source1] | R[source2]
+  return PC + 1
 
-def _xor(destination,  source1,  source2):
-    R[destination] = R[source1] ^ R[source2]
-    PC = PC + 1
+def _xor(PC, destination,  source1,  source2):
+  R[destination] = R[source1] ^ R[source2]
+  return PC + 1
 
-def _slt(destination,  source1,  source2):
+def _slt(PC, destination,  source1,  source2):
   if (R[source1] - R[source2] < 0):
     R[destination] = 1
   else:
     R[destination] = 0
 
-  PC = PC + 1
+  return PC + 1
 
-def _seq(destination,  source1,  source2):
+def _seq(PC, destination,  source1,  source2):
   if (R[source1] == R[source2]):
     R[destination] = 1
   else:
     R[destination] = 0
 
-  PC = PC + 1
+  return PC + 1
 
-def binary(string):
-  return bin(int(string))[2:]
+def binary(number):
+  return bin(number)[2:]
 
 def main():
-  print('machine started')
+  print('STARTING')
 
+  PC = 0
   R1 = 0
   R2 = 0
   R3 = 0
-  
-  while(PC < len(M)):
+
+  while (PC < len(M)):
     # Fetch binary instruction opcode
-    opcode = binary(M[PC] >> OP_OFFSET)
+    opcode = binary(int(M[PC], 2) >> OP_OFFSET)
 
     if (opcode == OP_LD):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
 
-      print("ld R" + int(R1, 2) + ", R" + int(R2, 2))
-      _load(R1, R2)
+      print("ld R" + str(R1) + ", R" + str(R2))
+      PC = _load(PC, R1, R2)
 
     elif (opcode == OP_ST):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
 
-      print("st R" + int(R1, 2) + ", R" + int(R2, 2))
-      _store(R1, R2)
+      print("st R" + str(R1) + ", R" + str(R2))
+      PC = _store(PC, R1, R2)
 
     elif (opcode == OP_ADD):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("add R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _add(R1, R2, R3)
+      print("add R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _add(PC, R1, R2, R3)
 
     elif (opcode == OP_SUB):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("sub R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _sub(R1, R2, R3)
+      print("sub R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _sub(PC, R1, R2, R3)
 
     elif (opcode == OP_BEQ):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("beq R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _beq(R1, R2, R3)
+      print("beq R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _beq(PC, R1, R2, R3)
 
     elif (opcode == OP_SHL):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("shl R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _shl(R1, R2, R3)
+      print("shl R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _shl(PC, R1, R2, R3)
 
     elif (opcode == OP_SHR):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("shr R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _shr(R1, R2, R3)
+      print("shr R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _shr(PC, R1, R2, R3)
 
-    elif (opcode == OP_BR):
-      R1 = binary(M[PC] >> R1_OFFSET)
+    # elif (opcode == OP_BR):
+    #   R1 = binary(int(M[PC], 2) >> R1_OFFSET)
 
-      print("br R" + int(R1, 2))
-      _br(R1)
+    #   print("br R" + str(R1))
+    #   _br(R1)
 
     elif (opcode == OP_ADDC):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("addc R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _addc(R1, R2, R3)
+      print("addc R" + str(R1) + ", R" + str(R2) + ", " + str(R3))
+      PC = _addc(PC, R1, R2, R3)
 
     elif (opcode == OP_SUBC):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("subc R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _subc(R1, R2, R3)
+      print("addc R" + str(R1) + ", R" + str(R2) + ", " + str(R3))
+      PC = _subc(PC, R1, R2, R3)
 
     elif (opcode == OP_AND):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("and R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _and(R1, R2, R3)
+      print("and R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _and(PC, R1, R2, R3)
 
     elif (opcode == OP_OR):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("or R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _or(R1, R2, R3)
+      print("or R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _or(PC, R1, R2, R3)
 
     elif (opcode == OP_XOR):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
 
-      print("xor R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _xor(R1, R2, R3)
+      print("xor R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      PC = _xor(PC, R1, R2, R3)
 
-    elif (opcode == OP_SLT):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+    # elif (opcode == OP_SLT):
+    #   R1 = binary(int(M[PC], 2) >> R1_OFFSET)
+    #   R2 = binary(int(M[PC], 2) >> R2_OFFSET)
+    #   R3 = binary(int(M[PC], 2) >> R3_OFFSET)
 
-      print("slt R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _slt(R1, R2, R3)
+    #   print("slt R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+    #   _slt(PC, R1, R2, R3)
 
-    elif (opcode == OP_SEQ):
-      R1 = binary(M[PC] >> R1_OFFSET)
-      R2 = binary(M[PC] >> R2_OFFSET)
-      R3 = binary(M[PC] >> R3_OFFSET)
+    # elif (opcode == OP_SEQ):
+    #   R1 = binary(int(M[PC], 2) >> R1_OFFSET)
+    #   R2 = binary(int(M[PC], 2) >> R2_OFFSET)
+    #   R3 = binary(int(M[PC], 2) >> R3_OFFSET)
 
-      print("seq R" + int(R1, 2) + ", R" + int(R2, 2) + ", R" + int(R3, 2))
-      _seq(R1, R2, R3)
+    #   print("seq R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+    #   _seq(PC, R1, R2, R3)
   
+    printRegisters()
   print('bye')
   return (0)
 
