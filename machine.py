@@ -51,7 +51,7 @@ def _shr(PC, destination, source1, source2):
   R[destination] = R[source1] >> R[source2]
   return PC + 1
 
-def _br(address):
+def _jmp(address):
   return address
 
 def _addc(PC, destination, source, val):
@@ -60,6 +60,14 @@ def _addc(PC, destination, source, val):
 
 def _subc(PC, destination, source, val):
   R[destination] = R[source] - val
+  return PC + 1
+
+def _shlc(PC, destination, source, val):
+  R[destination] = R[source] << val
+  return PC + 1
+
+def _shrc(PC, destination, source, val):
+  R[destination] = R[source] >> val
   return PC + 1
 
 def _and(PC, destination, source1, source2):
@@ -82,8 +90,16 @@ def _slt(PC, destination,  source1,  source2):
 
   return PC + 1
 
-def _seq(PC, destination,  source1,  source2):
+def _cmpeq(PC, destination,  source1,  source2):
   if (R[source1] == R[source2]):
+    R[destination] = 1
+  else:
+    R[destination] = 0
+
+  return PC + 1
+
+def _cmpeqc(PC, destination,  source, val):
+  if (R[source] == val):
     R[destination] = 1
   else:
     R[destination] = 0
@@ -159,11 +175,11 @@ def main():
       print("shr R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
       PC = _shr(PC, R1, R2, R3)
 
-    # elif (opcode == OP_BR):
-    #   R1 = binary(int(M[PC], 2) >> R1_OFFSET)
+    elif (opcode == OP_JMP):
+      R1 = binary(int(M[PC], 2) >> R1_OFFSET)
 
-    #   print("br R" + str(R1))
-    #   _br(R1)
+      print("br R" + str(R1))
+      _jmp(R1)
 
     elif (opcode == OP_ADDC):
       R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
@@ -180,6 +196,22 @@ def main():
 
       print("addc R" + str(R1) + ", R" + str(R2) + ", " + str(R3))
       PC = _subc(PC, R1, R2, R3)
+
+    elif (opcode == OP_SHLC):
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
+
+      print("addc R" + str(R1) + ", R" + str(R2) + ", " + str(R3))
+      PC = _shlc(PC, R1, R2, R3)
+
+    elif (opcode == OP_SHRC):
+      R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
+      R2 = int(binary(int(M[PC], 2) >> R2_OFFSET)[-5:], 2)
+      R3 = int(binary(int(M[PC], 2) >> R3_OFFSET)[-5:], 2)
+
+      print("addc R" + str(R1) + ", R" + str(R2) + ", " + str(R3))
+      PC = _shrc(PC, R1, R2, R3)
 
     elif (opcode == OP_AND):
       R1 = int(binary(int(M[PC], 2) >> R1_OFFSET)[-5:], 2)
@@ -205,21 +237,21 @@ def main():
       print("xor R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
       PC = _xor(PC, R1, R2, R3)
 
-    # elif (opcode == OP_SLT):
-    #   R1 = binary(int(M[PC], 2) >> R1_OFFSET)
-    #   R2 = binary(int(M[PC], 2) >> R2_OFFSET)
-    #   R3 = binary(int(M[PC], 2) >> R3_OFFSET)
+    elif (opcode == OP_CMPEQ):
+      R1 = binary(int(M[PC], 2) >> R1_OFFSET)
+      R2 = binary(int(M[PC], 2) >> R2_OFFSET)
+      R3 = binary(int(M[PC], 2) >> R3_OFFSET)
 
-    #   print("slt R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
-    #   _slt(PC, R1, R2, R3)
+      print("seq R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
+      _cmpeq(PC, R1, R2, R3)
 
-    # elif (opcode == OP_SEQ):
-    #   R1 = binary(int(M[PC], 2) >> R1_OFFSET)
-    #   R2 = binary(int(M[PC], 2) >> R2_OFFSET)
-    #   R3 = binary(int(M[PC], 2) >> R3_OFFSET)
+    elif (opcode == OP_CMPEQC):
+      R1 = binary(int(M[PC], 2) >> R1_OFFSET)
+      R2 = binary(int(M[PC], 2) >> R2_OFFSET)
+      R3 = binary(int(M[PC], 2) >> R3_OFFSET)
 
-    #   print("seq R" + str(R1) + ", R" + str(R2) + ", R" + str(R3))
-    #   _seq(PC, R1, R2, R3)
+      print("seq R" + str(R1) + ", R" + str(R2) + ", " + str(R3))
+      _cmpeqc(PC, R1, R2, R3)
   
     printRegisters()
   print('bye')
