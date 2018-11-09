@@ -1,96 +1,94 @@
-# REGISTERS
-R1 = 0
-R2 = 0
-R3 = 0
-
-## Index 0 not used
+## Index 0 not used (R1, R2, R3)
 R = [0, 0, 0, 0]
 
-def _load(PC, destination, address):
-  # R[destination] = M[address]
-  return PC + 1
+## Local Memory
+MEM = [0, 0, 0, 0, 0, 0, 0, 0]
 
-def _store(PC, source, address):
-  # M[address] = R[source]
-  return PC + 1
+def _load(args):
+  R[args[1]] = MEM[args[2]]
+  return args[0] + 1
 
-def _add(PC, destination, source1, source2):
-  R[destination]= R[source1] + R[source2]
-  return PC + 1
+def _store(args):
+  MEM[args[1]] = R[args[2]]
+  print('ModifiedMEM', MEM)
+  return args[0] + 1
 
-def _sub(PC, destination, source1, source2):
-  R[destination]= R[source1] - R[source2]
-  return PC + 1
+def _add(args):
+  R[args[1]] = R[args[2]] + R[args[3]]
+  return args[0] + 1
 
-def _beq(PC, source1, source2, address):
-  if(R[source2] - R[source1] == 0):
-    return address
+def _sub(args):
+  R[args[1]] = R[args[2]] - R[args[3]]
+  return args[0] + 1
+
+def _beq(args):
+  if(R[args[2]] - R[args[1]] == 0):
+    return args[3]
   else:
-    return PC + 1
+    return args[0] + 1
 
-def _shl(PC, destination, source1, source2):
-  R[destination] = R[source1] << R[source2]
-  return PC + 1
+def _shl(args):
+  R[args[1]] = R[args[2]] << R[args[3]]
+  return args[0] + 1
 
-def _shr(PC, destination, source1, source2):
-  R[destination] = R[source1] >> R[source2]
-  return PC + 1
+def _shr(args):
+  R[args[1]] = R[args[2]] >> R[args[3]]
+  return args[0] + 1
 
-def _jmp(address):
-  print('address', address)
-  return address
+def _jmp(args):
+  return args[1]
 
-def _addc(PC, destination, source, val):
-  R[destination] = R[source] + val
-  return PC + 1
+def _addc(args):
+  R[args[1]] = R[args[2]] + args[3]
+  return args[0] + 1
 
-def _subc(PC, destination, source, val):
-  R[destination] = R[source] - val
-  return PC + 1
+def _subc(args):
+  R[args[1]] = R[args[2]] - args[3]
+  return args[0] + 1
 
-def _shlc(PC, destination, source, val):
-  R[destination] = R[source] << val
-  return PC + 1
+def _shlc(args):
+  R[args[1]] = R[args[2]] << args[3]
+  return args[0] + 1
 
-def _shrc(PC, destination, source, val):
-  R[destination] = R[source] >> val
-  return PC + 1
+def _shrc(args):
+  R[args[1]] = R[args[2]] >> args[3]
+  return args[0] + 1
 
-def _and(PC, destination, source1, source2):
-  R[destination] = R[source1] & R[source2]
-  return PC + 1
+def _and(args):
+  R[args[1]] = R[args[2]] & R[args[3]]
+  return args[0] + 1
 
-def _or(PC, destination, source1, source2):
-  R[destination] = R[source1] | R[source2]
-  return PC + 1
+def _or(args):
+  R[args[1]] = R[args[2]] | R[args[3]]
+  return args[0] + 1
 
-def _xor(PC, destination, source1, source2):
-  R[destination] = R[source1] ^ R[source2]
-  return PC + 1
+def _xor(args):
+  R[args[1]] = R[args[2]] ^ R[args[3]]
+  return args[0] + 1
 
-def _slt(PC, destination, source1, source2):
-  if (R[source1] - R[source2] < 0):
-    R[destination] = 1
+def _slt(args):
+  if (R[args[2]] - R[args[3]] < 0):
+    R[args[1]] = 1
   else:
-    R[destination] = 0
+    R[args[1]] = 0
 
-  return PC + 1
+  return args[0] + 1
 
-def _cmpeq(PC, destination, source1, source2):
-  if (R[source1] == R[source2]):
-    R[destination] = 1
+def _cmpeq(args):
+  if (R[args[2]] == R[args[3]]):
+    R[args[1]] = 1
   else:
-    R[destination] = 0
+    R[args[1]] = 0
 
-  return PC + 1
+  return args[0] + 1
 
-def _cmpeqc(PC, destination, source, val):
-  if (R[source] == val):
-    R[destination] = 1
+def _cmpeqc(args):
+  if (R[args[2]] == args[3]):
+    R[args[1]] = 1
   else:
-    R[destination] = 0
+    R[args[1]] = 0
 
-  return PC + 1
+  return args[0] + 1
 
 dispatch = {
   'OP_LD'     : _load,
@@ -113,4 +111,4 @@ dispatch = {
 }
 
 def exec_instruction(instr, args):
-  return dispatch[instr](args[0], args[1], args[2], args[3])
+  return dispatch[instr](args)
