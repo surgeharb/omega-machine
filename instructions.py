@@ -1,3 +1,10 @@
+########################################################
+## This module maps every hardcoded micro-instruction ##
+##  to its memory address in the dispatch dictionary  ##
+##   representing memory addresses to be pointed to   ##
+##    in the lower level methodolgy (machine logic)   ##
+########################################################
+
 ## Index 0 not used (R1, R2, R3)
 R = [0, 0, 0, 0]
 
