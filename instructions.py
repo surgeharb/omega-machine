@@ -75,7 +75,10 @@ def _slt(args):
   return args[0] + 1
 
 def _cmpeq(args):
-  if (R[args[2]] == R[args[3]]):
+  CF = 0  # COMPARE FLAG
+  CF = (R[args[2]] - R[args[3]]) == 0
+
+  if (CF == 0):
     R[args[1]] = 1
   else:
     R[args[1]] = 0
@@ -83,7 +86,10 @@ def _cmpeq(args):
   return args[0] + 1
 
 def _cmpeqc(args):
-  if (R[args[2]] == args[3]):
+  CF = 0  # COMPARE FLAG
+  CF = (R[args[2]] - args[3]) == 0
+
+  if (CF == 0):
     R[args[1]] = 1
   else:
     R[args[1]] = 0
